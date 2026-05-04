@@ -22,7 +22,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from predict import predict
+from predict import predict, predict_many
 
 DATA_DIR = Path(__file__).parent / "data"
 REQUEST_FIELDS = ["pickup_zone", "dropoff_zone", "requested_at", "passenger_count"]
@@ -34,10 +34,13 @@ def run(input_path: Path, output_path: Path | None, sample_n: int | None = None)
         df = df.sample(n=sample_n, random_state=42).reset_index(drop=True)
     print(f"Predicting {len(df):,} rows from {input_path.name}...", file=sys.stderr)
 
-    preds = np.empty(len(df), dtype=np.float64)
-    records = df[REQUEST_FIELDS].to_dict("records")
-    for i, req in enumerate(records):
-        preds[i] = predict(req)
+    try:
+        preds = predict_many(df[REQUEST_FIELDS])
+    except Exception:
+        preds = np.empty(len(df), dtype=np.float64)
+        records = df[REQUEST_FIELDS].to_dict("records")
+        for i, req in enumerate(records):
+            preds[i] = predict(req)
 
     if output_path is not None:
         # Echo the input's row_idx so the grader can verify row order on

@@ -33,7 +33,7 @@ and changed means the AutoResearch loop found a better variant than the plan.
 | Planned item | Status | Evidence / note |
 |---|---|---|
 | LightGBM quantile alpha=0.5 | Changed | Used scikit-learn HistGradientBoosting. Quantile/absolute-error were tested, but squared-error won Dev MAE after ablation. |
-| Recency-weighted samples | Implemented | Final promoted model uses half-life 90 days, floor 0.30. |
+| Recency-weighted samples | Implemented | Final promoted model uses half-life 45 days, floor 0.30. |
 | Separate same-zone model | Implemented | Kept; disabling it was slightly worse in the research log. |
 | Ablation table | Implemented | `research_log.csv` records named experiments, Dev MAE, promotion status, and args. |
 
@@ -50,6 +50,6 @@ and changed means the AutoResearch loop found a better variant than the plan.
 |---|---|---|
 | Metric-driven experiment loop | Implemented after audit | `autoresearch.py` runs named experiments, parses `dev_mae`, writes `research_log.csv`, and promotes only better artifacts. |
 | One experiment per meaningful change | Partial | Experiments are logged in a ledger. I did not create one git commit per experiment because several runs were intentionally grouped, but the ledger preserves the trajectory. |
-| Keep only if better | Implemented | Promoted `baseline_1m`, `squared_error_1m`, `squared_error_no_cap_1m`, and `squared_error_no_cap_1m_340`. |
+| Keep only if better | Implemented | Promoted only metric winners, ending at `squared_error_no_cap_hl45_1m_620`. |
 
-Final promoted experiment: `squared_error_no_cap_1m_340`.
+Final promoted experiment: `squared_error_no_cap_hl45_1m_620`.

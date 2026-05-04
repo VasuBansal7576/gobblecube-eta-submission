@@ -1,211 +1,211 @@
 {
-  "experiment_name": "squared_error_no_cap_1m_340",
-  "dev_mae": 250.80486683432588,
-  "model_only_mae": 251.51234177096342,
+  "experiment_name": "squared_error_no_cap_hl45_1m_620",
+  "dev_mae": 249.60513938729542,
+  "model_only_mae": 250.54920355165834,
   "pair_hour_prior_mae": 273.7549133300781,
   "pair_prior_mae": 299.86846923828125,
   "physics_mae": 300.353271484375,
-  "blend_weight": 1.0,
-  "same_zone_blend_weight": 0.1,
+  "blend_weight": 0.9500000000000001,
+  "same_zone_blend_weight": 0.05,
   "segment_mae": {
-    "overall": 250.80486683432588,
-    "same_zone": 209.110120643982,
-    "airport_route": 428.4572141647556,
-    "manhattan_internal": 216.2531687897684,
-    "manhattan_to_outer": 405.89501520422147,
-    "outer_to_outer": 537.4112979740096,
-    "rush_hour": 264.825601222366,
-    "late_night": 194.87624873907373
+    "overall": 249.60513938729542,
+    "same_zone": 209.13338998956482,
+    "airport_route": 430.6790420375989,
+    "manhattan_internal": 214.20834564351426,
+    "manhattan_to_outer": 409.112466805101,
+    "outer_to_outer": 540.0006869403842,
+    "rush_hour": 263.71453896668686,
+    "late_night": 192.42527619193595
   },
   "residual_summary": {
     "hour": [
       {
         "hour": 16,
-        "mean": 303.1361226738693,
+        "mean": 303.0013676009122,
         "count": 84586
       },
       {
         "hour": 15,
-        "mean": 299.12079243187765,
+        "mean": 299.5950698752223,
         "count": 86777
       },
       {
         "hour": 17,
-        "mean": 297.0052701592845,
+        "mean": 298.7600591700716,
         "count": 86091
       },
       {
         "hour": 14,
-        "mean": 279.0118706070214,
+        "mean": 278.3369315027456,
         "count": 81935
       },
       {
         "hour": 18,
-        "mean": 265.04461839617073,
+        "mean": 264.59591834573337,
         "count": 84832
       },
       {
         "hour": 13,
-        "mean": 261.4423267740371,
+        "mean": 262.0078512117191,
         "count": 76744
       },
       {
-        "hour": 11,
-        "mean": 254.8325825599319,
-        "count": 65964
+        "hour": 12,
+        "mean": 253.05430403477058,
+        "count": 73135
       },
       {
-        "hour": 12,
-        "mean": 253.84085534935224,
-        "count": 73135
+        "hour": 11,
+        "mean": 252.65521902212015,
+        "count": 65964
       }
     ],
     "dow": [
       {
         "dow": 2,
-        "mean": 275.1424015851927,
+        "mean": 275.14438673300396,
         "count": 197778
       },
       {
         "dow": 3,
-        "mean": 271.9306652632127,
+        "mean": 271.51042905584677,
         "count": 199505
       },
       {
         "dow": 1,
-        "mean": 260.2800690544,
+        "mean": 257.8505670315928,
         "count": 188329
       },
       {
         "dow": 4,
-        "mean": 254.87372320305334,
+        "mean": 254.10339082965137,
         "count": 195420
       },
       {
-        "dow": 5,
-        "mean": 233.93362570264472,
-        "count": 163714
-      },
-      {
         "dow": 0,
-        "mean": 231.59324071616473,
+        "mean": 231.77823571155898,
         "count": 145315
       },
       {
+        "dow": 5,
+        "mean": 229.47654084553892,
+        "count": 163714
+      },
+      {
         "dow": 6,
-        "mean": 207.8201338129307,
+        "mean": 207.2350030809655,
         "count": 140839
       }
     ],
     "route_class": [
       {
         "route_class": 4,
-        "mean": 537.4112979740096,
+        "mean": 540.0006869403842,
         "count": 14479
       },
       {
         "route_class": 1,
-        "mean": 428.4572141647556,
+        "mean": 430.6790420375988,
         "count": 130690
       },
       {
         "route_class": 3,
-        "mean": 405.89501520422147,
+        "mean": 409.1124668051009,
         "count": 55731
       },
       {
         "route_class": 2,
-        "mean": 216.2531687897685,
+        "mean": 214.20834564351404,
         "count": 970888
       },
       {
         "route_class": 0,
-        "mean": 209.11012064398201,
+        "mean": 209.13338998956482,
         "count": 59112
       }
     ],
     "pickup_zone": [
       {
         "pickup_zone": 86,
-        "mean": 1295.931646735717,
+        "mean": 1235.485982597311,
         "count": 113
       },
       {
         "pickup_zone": 55,
-        "mean": 1237.3053329768247,
+        "mean": 1175.024010256359,
         "count": 108
-      },
-      {
-        "pickup_zone": 205,
-        "mean": 892.5163332662455,
-        "count": 118
       },
       {
         "pickup_zone": 218,
-        "mean": 878.4216944043106,
+        "mean": 891.9183743168884,
         "count": 154
       },
       {
+        "pickup_zone": 205,
+        "mean": 884.6396634493509,
+        "count": 118
+      },
+      {
         "pickup_zone": 35,
-        "mean": 864.1083960648059,
+        "mean": 851.0577597757638,
         "count": 238
       },
       {
-        "pickup_zone": 165,
-        "mean": 826.3465112321776,
-        "count": 108
-      },
-      {
         "pickup_zone": 191,
-        "mean": 820.8293366512887,
+        "mean": 834.753518480327,
         "count": 131
       },
       {
         "pickup_zone": 169,
-        "mean": 819.2812859730119,
+        "mean": 825.5070264713139,
         "count": 118
+      },
+      {
+        "pickup_zone": 165,
+        "mean": 822.4226469332558,
+        "count": 108
       }
     ],
     "dropoff_zone": [
       {
         "dropoff_zone": 265,
-        "mean": 885.6499889976756,
+        "mean": 885.9285934436102,
         "count": 5505
       },
       {
         "dropoff_zone": 55,
-        "mean": 734.2046630711873,
+        "mean": 750.0321496566689,
         "count": 235
       },
       {
         "dropoff_zone": 108,
-        "mean": 707.7380811838347,
+        "mean": 701.3361378007608,
         "count": 111
       },
       {
-        "dropoff_zone": 222,
-        "mean": 667.6417856061163,
-        "count": 166
-      },
-      {
         "dropoff_zone": 29,
-        "mean": 658.2132563551025,
+        "mean": 657.6899856253964,
         "count": 207
       },
       {
-        "dropoff_zone": 169,
-        "mean": 644.455873126855,
-        "count": 241
+        "dropoff_zone": 242,
+        "mean": 649.2091021255833,
+        "count": 182
       },
       {
-        "dropoff_zone": 136,
-        "mean": 634.2119777660986,
-        "count": 189
+        "dropoff_zone": 117,
+        "mean": 643.7761147674468,
+        "count": 148
       },
       {
         "dropoff_zone": 51,
-        "mean": 632.000105508494,
+        "mean": 637.205977940876,
         "count": 243
+      },
+      {
+        "dropoff_zone": 136,
+        "mean": 636.6384101253005,
+        "count": 189
       }
     ]
   },
@@ -213,9 +213,9 @@
   "model_train_rows": 1000000,
   "loss": "squared_error",
   "target_cap_quantile": 1.0,
-  "recency_half_life_days": 90.0,
+  "recency_half_life_days": 45.0,
   "recency_floor": 0.3,
   "disabled_feature_groups": [],
   "same_zone_model_enabled": true,
-  "elapsed_seconds": 126.4
+  "elapsed_seconds": 188.4
 }

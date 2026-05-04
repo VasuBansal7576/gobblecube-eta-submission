@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # unpickle model.pkl at build time — that runs untrusted candidate code on
 # the grader host before any sandbox applies. The first docker-run invocation
 # is the smoke test; it runs inside the sandboxed grader container.
-COPY predict.py features.py grade.py ./
+COPY predict.py features.py train.py grade.py ./
 COPY model.pkl ./
 
 # Grader invokes:  python grade.py <input.parquet> <output.csv>

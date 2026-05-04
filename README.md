@@ -17,9 +17,10 @@ by `predict.py` is stored in `model.pkl`.
 
 ## Final Dev Score
 
-- `python grade.py` 50k Dev sample MAE: **253.3 seconds**
-- Full local Dev MAE from `train.py`: **250.8 seconds**
-- Docker image size: **966MB**
+- `python grade.py` 50k Dev sample MAE: **252.6 seconds**
+- Full local Dev MAE from `train.py`: **249.6 seconds**
+- Network-disabled Docker 50k run: **252.6 seconds MAE in 3.05s**
+- Docker image size: **205MB**
 
 Starter reference from the challenge README: naive GBT baseline is about
 `351s` Dev / `367s` Eval, and a simple zone-pair lookup is about `300s` Dev.
@@ -30,9 +31,9 @@ The core model treats ETA as a structured tabular problem rather than a raw
 zone-id regression. I build full-year 2023 priors for route duration, observed
 distance, speed, demand density, fare-regime likelihood, and route class. I
 started with quantile loss because Gobblecube scores MAE, but the ablation loop
-found that a squared-error `HistGradientBoostingRegressor` on the cleaned
-feature stack scored better on Dev. The shipped model uses the measured winner,
-not the initial theory.
+found that a squared-error `HistGradientBoostingRegressor` with aggressive
+45-day recency weighting scored better on Dev. The shipped model uses the
+measured winner, not the initial theory.
 
 Main pieces:
 
@@ -78,12 +79,19 @@ Measured on full local Dev inside `train.py`:
 | 1M-row quantile control | 252.1s |
 | 1M-row squared-error | 251.5s |
 | 1M-row squared-error, no target cap | 251.2s |
-| Final 1M-row squared-error, no target cap, 340 iters | **250.8s** |
+| 1M-row squared-error, no cap, 340 iters | 250.8s |
+| Same, 520 iters | 250.8s |
+| Same, 45-day recency half-life, 340 iters | 250.5s |
+| Same, 30-day recency half-life, 340 iters | 252.9s |
+| Same, 60-day recency half-life, 340 iters | 251.9s |
+| Same, 45-day recency half-life, 420 iters | 250.0s |
+| Same, 45-day recency half-life, 520 iters | 249.7s |
+| Final: same, 45-day recency half-life, 620 iters | **249.6s** |
 
 The metric-driven loop is in `autoresearch.py`, with results in
 `research_log.csv` and per-run JSON files in `research_runs/`. A larger 2M-row
-variant and a 6M-row earlier run both scored worse than the final 1M-row model,
-so the smaller model is intentional.
+variant scored worse, and the recency sweep found a real local optimum: 30,
+60, 90, and 150-day half-lives all lost to 45 days.
 
 ## Diagnostics
 
@@ -91,14 +99,14 @@ Segmented MAE from the selected model:
 
 | Segment | MAE |
 |---|---:|
-| Overall | 250.8s |
+| Overall | 249.6s |
 | Same-zone | 209.1s |
-| Manhattan internal | 216.3s |
-| Airport route | 428.5s |
-| Manhattan to/from outer borough | 405.9s |
-| Outer-to-outer | 537.4s |
-| Rush hour | 264.8s |
-| Late night | 194.9s |
+| Manhattan internal | 214.2s |
+| Airport route | 430.7s |
+| Manhattan to/from outer borough | 409.1s |
+| Outer-to-outer | 540.0s |
+| Rush hour | 263.7s |
+| Late night | 192.4s |
 
 Residual analysis shows remaining error is concentrated in afternoon peak
 hours, airport routes, outer-borough routes, and dropoffs into zone `265`
@@ -107,9 +115,11 @@ blindly adding more global features.
 
 ## What Did Not Work
 
-- Training on a larger 6M-row weighted sample worsened Dev MAE, likely because
+- Training on a larger 2M-row weighted sample worsened Dev MAE, likely because
   the tree started fitting older/noisier regimes instead of the cleaner
   recency-weighted signal.
+- The recency curve mattered: 30, 60, 90, and 150-day half-lives all lost to
+  45 days on Dev.
 - The metric argument for quantile/absolute-error loss was directionally
   sensible but empirically wrong here. Squared-error scored better once the
   target, priors, and features were in place.
@@ -127,7 +137,8 @@ construction, verification, and the ablation loop. The useful loop was:
 propose one modeling change, encode it in `train.py`, run `autoresearch.py`,
 compare Dev MAE, and promote only if the metric improved. The loop overturned
 two plausible assumptions: quantile loss and winsorization both sounded right,
-but squared-error with no target cap scored better.
+but squared-error with no target cap scored better. A second loop then
+hill-climbed the recency/iteration neighborhood from 250.8s to 249.6s.
 
 ## Reproduce
 
@@ -141,11 +152,12 @@ python data/download_data.py
 
 # Reproduce the final promoted model.pkl and metrics.json.
 python train.py \
-  --experiment-name squared_error_no_cap_1m_340 \
+  --experiment-name squared_error_no_cap_hl45_1m_620 \
   --sample-n 1000000 \
-  --max-iter 340 \
+  --max-iter 620 \
   --loss squared_error \
-  --target-cap-quantile 1.0
+  --target-cap-quantile 1.0 \
+  --recency-half-life-days 45
 
 # Optional: rerun the recorded ablation loop.
 python autoresearch.py --promote

@@ -287,7 +287,7 @@ def build_single_features(request: dict, artifacts: dict) -> np.ndarray:
 
     h_sin, h_cos = cyc(hour + ts.minute / 60.0, 24.0)
     dow_sin, dow_cos = cyc(dow, 7.0)
-    doy_sin, doy_cos = cyc(doy, 366.0 if ts.year % 4 == 0 else 365.0)
+    doy_sin, doy_cos = cyc(doy, 365.0)
     q_sin, q_cos = cyc(qhour, 96.0)
     is_holiday, is_eve, is_dec, is_nye = calendar_flags(ts)
 
