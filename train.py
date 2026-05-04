@@ -560,13 +560,16 @@ def train_model(
     weights: np.ndarray,
     max_iter: int,
     loss: str,
+    learning_rate: float,
+    max_leaf_nodes: int,
+    min_samples_leaf: int,
 ) -> HistGradientBoostingRegressor:
     kwargs = {
         "loss": loss,
         "max_iter": max_iter,
-        "learning_rate": 0.055,
-        "max_leaf_nodes": 63,
-        "min_samples_leaf": 80,
+        "learning_rate": learning_rate,
+        "max_leaf_nodes": max_leaf_nodes,
+        "min_samples_leaf": min_samples_leaf,
         "l2_regularization": 0.02,
         "validation_fraction": None,
         "random_state": 42,
@@ -638,6 +641,18 @@ def segment_table(dev: pd.DataFrame, y: np.ndarray, pred: np.ndarray) -> dict[st
     return out
 
 
+def late_time_table(dev: pd.DataFrame, y: np.ndarray, pred: np.ndarray) -> dict[str, float | int | str]:
+    cutoff = dev["_ts"].quantile(0.75)
+    mask = (dev["_ts"] >= cutoff).to_numpy()
+    if mask.sum() == 0:
+        return {"late_time_mae": float("nan"), "late_time_rows": 0, "late_time_cutoff": ""}
+    return {
+        "late_time_mae": mae(y[mask], pred[mask]),
+        "late_time_rows": int(mask.sum()),
+        "late_time_cutoff": cutoff.isoformat(),
+    }
+
+
 def residual_summary(dev: pd.DataFrame, y: np.ndarray, pred: np.ndarray) -> dict:
     residual = np.abs(pred - y)
     summary = {}
@@ -659,6 +674,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sample-n", type=int, default=3_000_000)
     parser.add_argument("--max-iter", type=int, default=420)
+    parser.add_argument("--learning-rate", type=float, default=0.055)
+    parser.add_argument("--max-leaf-nodes", type=int, default=63)
+    parser.add_argument("--min-samples-leaf", type=int, default=80)
+    parser.add_argument("--same-zone-max-iter", type=int, default=260)
     parser.add_argument("--loss", choices=["quantile", "squared_error", "absolute_error"], default="quantile")
     parser.add_argument("--target-cap-quantile", type=float, default=0.995)
     parser.add_argument("--recency-half-life-days", type=float, default=90.0)
@@ -703,7 +722,16 @@ def main() -> None:
     y_dev = dev["duration_seconds"].to_numpy(np.float32)
 
     print(f"Training {args.loss} model on {len(rows):,} rows...")
-    model = train_model(X_train, y_train[rows], weights[rows], args.max_iter, args.loss)
+    model = train_model(
+        X_train,
+        y_train[rows],
+        weights[rows],
+        args.max_iter,
+        args.loss,
+        args.learning_rate,
+        args.max_leaf_nodes,
+        args.min_samples_leaf,
+    )
 
     same_model = None
     same_mask_train = (train["pickup_zone"].to_numpy() == train["dropoff_zone"].to_numpy())
@@ -716,7 +744,16 @@ def main() -> None:
         print(f"Training same-zone model on {len(same_rows):,} rows...")
         X_same = build_feature_frame(train.iloc[same_rows].reset_index(drop=True), artifacts)
         X_same = disable_feature_groups(X_same, args.disable_feature_group)
-        same_model = train_model(X_same, y_train[same_rows], weights[same_rows], 260, args.loss)
+        same_model = train_model(
+            X_same,
+            y_train[same_rows],
+            weights[same_rows],
+            args.same_zone_max_iter,
+            args.loss,
+            args.learning_rate,
+            args.max_leaf_nodes,
+            args.min_samples_leaf,
+        )
 
     X_dev_np = X_dev.to_numpy(np.float32)
     model_pred = model.predict(X_dev_np)
@@ -732,9 +769,11 @@ def main() -> None:
         same_blend_w, _ = tune_blend(y_dev[same_mask_dev], same_pred, same_prior)
         final_pred[same_mask_dev] = same_blend_w * same_pred + (1.0 - same_blend_w) * same_prior
 
+    late_metrics = late_time_table(dev, y_dev, final_pred)
     metrics = {
         "experiment_name": args.experiment_name,
         "dev_mae": mae(y_dev, final_pred),
+        **late_metrics,
         "model_only_mae": mae(y_dev, model_pred),
         "pair_hour_prior_mae": mae(y_dev, prior),
         "pair_prior_mae": mae(y_dev, X_dev["pair_prior_duration"].to_numpy(np.float32)),
@@ -749,6 +788,11 @@ def main() -> None:
         "target_cap_quantile": args.target_cap_quantile,
         "recency_half_life_days": args.recency_half_life_days,
         "recency_floor": args.recency_floor,
+        "learning_rate": args.learning_rate,
+        "max_iter": args.max_iter,
+        "max_leaf_nodes": args.max_leaf_nodes,
+        "min_samples_leaf": args.min_samples_leaf,
+        "same_zone_max_iter": args.same_zone_max_iter,
         "disabled_feature_groups": args.disable_feature_group,
         "same_zone_model_enabled": same_model is not None,
         "elapsed_seconds": round(time.time() - t0, 1),

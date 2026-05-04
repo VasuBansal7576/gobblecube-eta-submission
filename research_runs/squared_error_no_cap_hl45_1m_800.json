@@ -1,0 +1,229 @@
+{
+  "experiment_name": "squared_error_no_cap_hl45_1m_800",
+  "dev_mae": 249.6715815918812,
+  "late_time_mae": 249.81004149563026,
+  "late_time_rows": 307725,
+  "late_time_cutoff": "2023-12-28T11:16:20.249999872",
+  "model_only_mae": 250.7878660710995,
+  "pair_hour_prior_mae": 273.7549133300781,
+  "pair_prior_mae": 299.86846923828125,
+  "physics_mae": 300.353271484375,
+  "blend_weight": 0.9500000000000001,
+  "same_zone_blend_weight": 0.05,
+  "segment_mae": {
+    "overall": 249.6715815918812,
+    "same_zone": 209.13338998956482,
+    "airport_route": 430.77427663781293,
+    "manhattan_internal": 214.21926854840953,
+    "manhattan_to_outer": 409.74609758906416,
+    "outer_to_outer": 541.6181816025513,
+    "rush_hour": 263.618822647319,
+    "late_night": 192.84824023372715
+  },
+  "residual_summary": {
+    "hour": [
+      {
+        "hour": 16,
+        "mean": 302.9395830264725,
+        "count": 84586
+      },
+      {
+        "hour": 15,
+        "mean": 299.5358639272562,
+        "count": 86777
+      },
+      {
+        "hour": 17,
+        "mean": 298.58082835955935,
+        "count": 86091
+      },
+      {
+        "hour": 14,
+        "mean": 278.6651944093886,
+        "count": 81935
+      },
+      {
+        "hour": 18,
+        "mean": 264.5030967515196,
+        "count": 84832
+      },
+      {
+        "hour": 13,
+        "mean": 262.317336068874,
+        "count": 76744
+      },
+      {
+        "hour": 12,
+        "mean": 253.2303747716978,
+        "count": 73135
+      },
+      {
+        "hour": 11,
+        "mean": 252.71205778310883,
+        "count": 65964
+      }
+    ],
+    "dow": [
+      {
+        "dow": 2,
+        "mean": 275.24410993412675,
+        "count": 197778
+      },
+      {
+        "dow": 3,
+        "mean": 271.7609894219972,
+        "count": 199505
+      },
+      {
+        "dow": 1,
+        "mean": 257.983718060002,
+        "count": 188329
+      },
+      {
+        "dow": 4,
+        "mean": 254.19079145322073,
+        "count": 195420
+      },
+      {
+        "dow": 0,
+        "mean": 231.9243051369816,
+        "count": 145315
+      },
+      {
+        "dow": 5,
+        "mean": 229.2224238014697,
+        "count": 163714
+      },
+      {
+        "dow": 6,
+        "mean": 207.1660805368863,
+        "count": 140839
+      }
+    ],
+    "route_class": [
+      {
+        "route_class": 4,
+        "mean": 541.6181816025513,
+        "count": 14479
+      },
+      {
+        "route_class": 1,
+        "mean": 430.774276637813,
+        "count": 130690
+      },
+      {
+        "route_class": 3,
+        "mean": 409.7460975890641,
+        "count": 55731
+      },
+      {
+        "route_class": 2,
+        "mean": 214.2192685484095,
+        "count": 970888
+      },
+      {
+        "route_class": 0,
+        "mean": 209.13338998956482,
+        "count": 59112
+      }
+    ],
+    "pickup_zone": [
+      {
+        "pickup_zone": 86,
+        "mean": 1236.8840003701864,
+        "count": 113
+      },
+      {
+        "pickup_zone": 55,
+        "mean": 1171.680602865094,
+        "count": 108
+      },
+      {
+        "pickup_zone": 218,
+        "mean": 896.5491781136858,
+        "count": 154
+      },
+      {
+        "pickup_zone": 205,
+        "mean": 884.4396565127387,
+        "count": 118
+      },
+      {
+        "pickup_zone": 35,
+        "mean": 853.6308984041818,
+        "count": 238
+      },
+      {
+        "pickup_zone": 191,
+        "mean": 843.428329076243,
+        "count": 131
+      },
+      {
+        "pickup_zone": 165,
+        "mean": 826.9279073874611,
+        "count": 108
+      },
+      {
+        "pickup_zone": 169,
+        "mean": 826.8587780325385,
+        "count": 118
+      }
+    ],
+    "dropoff_zone": [
+      {
+        "dropoff_zone": 265,
+        "mean": 885.7403862491308,
+        "count": 5505
+      },
+      {
+        "dropoff_zone": 55,
+        "mean": 753.5426890599284,
+        "count": 235
+      },
+      {
+        "dropoff_zone": 108,
+        "mean": 703.8531733898249,
+        "count": 111
+      },
+      {
+        "dropoff_zone": 29,
+        "mean": 658.2297789203159,
+        "count": 207
+      },
+      {
+        "dropoff_zone": 242,
+        "mean": 647.730737642455,
+        "count": 182
+      },
+      {
+        "dropoff_zone": 117,
+        "mean": 644.6948327330141,
+        "count": 148
+      },
+      {
+        "dropoff_zone": 51,
+        "mean": 637.8529481688888,
+        "count": 243
+      },
+      {
+        "dropoff_zone": 136,
+        "mean": 636.2686347198307,
+        "count": 189
+      }
+    ]
+  },
+  "train_rows": 36700149,
+  "model_train_rows": 1000000,
+  "loss": "squared_error",
+  "target_cap_quantile": 1.0,
+  "recency_half_life_days": 45.0,
+  "recency_floor": 0.3,
+  "learning_rate": 0.055,
+  "max_iter": 800,
+  "max_leaf_nodes": 63,
+  "min_samples_leaf": 80,
+  "same_zone_max_iter": 260,
+  "disabled_feature_groups": [],
+  "same_zone_model_enabled": true,
+  "elapsed_seconds": 166.8
+}

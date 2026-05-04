@@ -17,10 +17,10 @@ by `predict.py` is stored in `model.pkl`.
 
 ## Final Dev Score
 
-- `python grade.py` 50k Dev sample MAE: **252.6 seconds**
-- Full local Dev MAE from `train.py`: **249.6 seconds**
-- Network-disabled Docker 50k run: **252.6 seconds MAE in 3.05s**
-- Docker image size: **205MB**
+- `python grade.py` 50k Dev sample MAE: **251.8 seconds**
+- Full local Dev MAE from `train.py`: **248.9 seconds**
+- Network-disabled Docker 50k run: **251.8 seconds MAE in 2.90s**
+- Docker image size: **204MB**
 
 Starter reference from the challenge README: naive GBT baseline is about
 `351s` Dev / `367s` Eval, and a simple zone-pair lookup is about `300s` Dev.
@@ -32,8 +32,8 @@ zone-id regression. I build full-year 2023 priors for route duration, observed
 distance, speed, demand density, fare-regime likelihood, and route class. I
 started with quantile loss because Gobblecube scores MAE, but the ablation loop
 found that a squared-error `HistGradientBoostingRegressor` with aggressive
-45-day recency weighting scored better on Dev. The shipped model uses the
-measured winner, not the initial theory.
+38-day recency weighting and narrower trees scored better on Dev. The shipped
+model uses the measured winner, not the initial theory.
 
 Main pieces:
 
@@ -86,12 +86,15 @@ Measured on full local Dev inside `train.py`:
 | Same, 60-day recency half-life, 340 iters | 251.9s |
 | Same, 45-day recency half-life, 420 iters | 250.0s |
 | Same, 45-day recency half-life, 520 iters | 249.7s |
-| Final: same, 45-day recency half-life, 620 iters | **249.6s** |
+| Same, 45-day recency half-life, 620 iters | 249.6s |
+| Same, 38-day recency half-life, 620 iters | 249.4s |
+| Same, 38-day recency, 620 iters, 31 leaves | 249.0s |
+| Final: same, 38-day recency, 700 iters, 31 leaves | **248.9s** |
 
 The metric-driven loop is in `autoresearch.py`, with results in
 `research_log.csv` and per-run JSON files in `research_runs/`. A larger 2M-row
-variant scored worse, and the recency sweep found a real local optimum: 30,
-60, 90, and 150-day half-lives all lost to 45 days.
+variant scored worse, and the recency sweep found a narrow local optimum:
+36, 40, 45, 52, 60, 90, and 150-day half-lives all lost to 38 days.
 
 ## Diagnostics
 
@@ -99,14 +102,14 @@ Segmented MAE from the selected model:
 
 | Segment | MAE |
 |---|---:|
-| Overall | 249.6s |
+| Overall | 248.9s |
 | Same-zone | 209.1s |
-| Manhattan internal | 214.2s |
-| Airport route | 430.7s |
-| Manhattan to/from outer borough | 409.1s |
-| Outer-to-outer | 540.0s |
+| Manhattan internal | 214.4s |
+| Airport route | 426.1s |
+| Manhattan to/from outer borough | 404.0s |
+| Outer-to-outer | 527.1s |
 | Rush hour | 263.7s |
-| Late night | 192.4s |
+| Late night | 191.2s |
 
 Residual analysis shows remaining error is concentrated in afternoon peak
 hours, airport routes, outer-borough routes, and dropoffs into zone `265`
@@ -118,8 +121,8 @@ blindly adding more global features.
 - Training on a larger 2M-row weighted sample worsened Dev MAE, likely because
   the tree started fitting older/noisier regimes instead of the cleaner
   recency-weighted signal.
-- The recency curve mattered: 30, 60, 90, and 150-day half-lives all lost to
-  45 days on Dev.
+- The recency curve mattered: 36, 40, 45, 52, 60, 90, and 150-day half-lives
+  all lost to 38 days on Dev.
 - The metric argument for quantile/absolute-error loss was directionally
   sensible but empirically wrong here. Squared-error scored better once the
   target, priors, and features were in place.
@@ -137,8 +140,8 @@ construction, verification, and the ablation loop. The useful loop was:
 propose one modeling change, encode it in `train.py`, run `autoresearch.py`,
 compare Dev MAE, and promote only if the metric improved. The loop overturned
 two plausible assumptions: quantile loss and winsorization both sounded right,
-but squared-error with no target cap scored better. A second loop then
-hill-climbed the recency/iteration neighborhood from 250.8s to 249.6s.
+but squared-error with no target cap scored better. Later loops then
+hill-climbed the recency/tree-shape neighborhood from 250.8s to 248.9s.
 
 ## Reproduce
 
@@ -152,12 +155,13 @@ python data/download_data.py
 
 # Reproduce the final promoted model.pkl and metrics.json.
 python train.py \
-  --experiment-name squared_error_no_cap_hl45_1m_620 \
+  --experiment-name squared_error_no_cap_hl38_1m_700_leaf31 \
   --sample-n 1000000 \
-  --max-iter 620 \
+  --max-iter 700 \
+  --max-leaf-nodes 31 \
   --loss squared_error \
   --target-cap-quantile 1.0 \
-  --recency-half-life-days 45
+  --recency-half-life-days 38
 
 # Optional: rerun the recorded ablation loop.
 python autoresearch.py --promote
