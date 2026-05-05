@@ -50,6 +50,6 @@ and changed means the AutoResearch loop found a better variant than the plan.
 |---|---|---|
 | Metric-driven experiment loop | Implemented after audit | `autoresearch.py` runs named experiments, parses `dev_mae`, writes `research_log.csv`, and promotes only better artifacts. |
 | One experiment per meaningful change | Partial | Experiments are logged in a ledger. I did not create one git commit per experiment because several runs were intentionally grouped, but the ledger preserves the trajectory. |
-| Keep only if better | Implemented | Promoted only metric winners, ending at `squared_error_no_cap_hl38_1m_700_leaf31`. |
+| Keep only if better | Implemented | Promoted only metric winners, ending at `squared_error_no_cap_hl38_1m_820_leaf31`. |
 
-Final promoted experiment: `squared_error_no_cap_hl38_1m_700_leaf31`.
+Final promoted experiment: `squared_error_no_cap_hl38_1m_820_leaf31`.

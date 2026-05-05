@@ -17,9 +17,9 @@ by `predict.py` is stored in `model.pkl`.
 
 ## Final Dev Score
 
-- `python grade.py` 50k Dev sample MAE: **251.8 seconds**
-- Full local Dev MAE from `train.py`: **248.9 seconds**
-- Network-disabled Docker 50k run: **251.8 seconds MAE in 2.90s**
+- `python grade.py` 50k Dev sample MAE: **251.7 seconds**
+- Full local Dev MAE from `train.py`: **248.8 seconds**
+- Network-disabled Docker 50k run: **251.7 seconds MAE in 2.92s**
 - Docker image size: **204MB**
 
 Starter reference from the challenge README: naive GBT baseline is about
@@ -89,12 +89,13 @@ Measured on full local Dev inside `train.py`:
 | Same, 45-day recency half-life, 620 iters | 249.6s |
 | Same, 38-day recency half-life, 620 iters | 249.4s |
 | Same, 38-day recency, 620 iters, 31 leaves | 249.0s |
-| Final: same, 38-day recency, 700 iters, 31 leaves | **248.9s** |
+| Same, 38-day recency, 700 iters, 31 leaves | 248.9s |
+| Final: same, 38-day recency, 820 iters, 31 leaves | **248.8s** |
 
 The metric-driven loop is in `autoresearch.py`, with results in
 `research_log.csv` and per-run JSON files in `research_runs/`. A larger 2M-row
 variant scored worse, and the recency sweep found a narrow local optimum:
-36, 40, 45, 52, 60, 90, and 150-day half-lives all lost to 38 days.
+36, 37, 39, 40, 45, 52, 60, 90, and 150-day half-lives all lost to 38 days.
 
 ## Diagnostics
 
@@ -102,14 +103,14 @@ Segmented MAE from the selected model:
 
 | Segment | MAE |
 |---|---:|
-| Overall | 248.9s |
+| Overall | 248.8s |
 | Same-zone | 209.1s |
-| Manhattan internal | 214.4s |
-| Airport route | 426.1s |
-| Manhattan to/from outer borough | 404.0s |
-| Outer-to-outer | 527.1s |
-| Rush hour | 263.7s |
-| Late night | 191.2s |
+| Manhattan internal | 214.3s |
+| Airport route | 425.9s |
+| Manhattan to/from outer borough | 404.3s |
+| Outer-to-outer | 528.1s |
+| Rush hour | 263.5s |
+| Late night | 191.3s |
 
 Residual analysis shows remaining error is concentrated in afternoon peak
 hours, airport routes, outer-borough routes, and dropoffs into zone `265`
@@ -141,7 +142,7 @@ propose one modeling change, encode it in `train.py`, run `autoresearch.py`,
 compare Dev MAE, and promote only if the metric improved. The loop overturned
 two plausible assumptions: quantile loss and winsorization both sounded right,
 but squared-error with no target cap scored better. Later loops then
-hill-climbed the recency/tree-shape neighborhood from 250.8s to 248.9s.
+hill-climbed the recency/tree-shape neighborhood from 250.8s to 248.8s.
 
 ## Reproduce
 
@@ -155,9 +156,9 @@ python data/download_data.py
 
 # Reproduce the final promoted model.pkl and metrics.json.
 python train.py \
-  --experiment-name squared_error_no_cap_hl38_1m_700_leaf31 \
+  --experiment-name squared_error_no_cap_hl38_1m_820_leaf31 \
   --sample-n 1000000 \
-  --max-iter 700 \
+  --max-iter 820 \
   --max-leaf-nodes 31 \
   --loss squared_error \
   --target-cap-quantile 1.0 \
